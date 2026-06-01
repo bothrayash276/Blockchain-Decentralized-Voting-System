@@ -71,9 +71,9 @@ class Blockchain {
         return block
     }
 
-    // Function to add vote
-    add_vote(voter_id, candidate) {
 
+    // Smart Contract
+    validate_vote(voter_id, candidate) {
         // Checking if voter is present in the voting list
         const voter = registered_voters.filter(vID => vID === voter_id);
         if (!voter[0]) throw new Error("Voter is not registered in the voting list");
@@ -87,8 +87,14 @@ class Blockchain {
             // Re-iterating the entire blockchain
             if (this.blockchain[i].voteData.voter_id === voter_id) throw new Error(`${voter_id} has already cast the vote`);
         }
+    }
 
-        // All the checks have been passed, now new vote is added to the blockchain
+
+    // Function to add vote
+    add_vote(voter_id, candidate) {
+
+        // Checking if vote is valid
+        this.validate_vote(voter_id, candidate);
 
         // Voting Data Object
         const voteDate = {
@@ -165,8 +171,6 @@ class Blockchain {
         return candi
     }
 
-
-    
 
 }
 
