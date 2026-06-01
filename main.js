@@ -171,6 +171,31 @@ class Blockchain {
         return candi
     }
 
+    // Election Result declaration
+    declare_winner() {
+        // Getting the counted votes
+        const votes = this.count_votes();
+
+        // Initializing the highest vote count
+        let higest_votes = 0;
+
+        // Getting the highest vote count
+        for (const candi in votes) {
+            if (higest_votes < votes[candi]) higest_votes = votes[candi] ;
+        }
+
+        // Intializing a array of candidates with higest votes
+        const winner = [];
+
+        // Pushing the name of candidate with highest votes in the array
+        for (const candi in votes) {
+            if (higest_votes === votes[candi]) winner.push(candi)
+        }
+
+        // Checking if there is a tie or not
+        if (winner.length === 1) console.log(`\nElection Winner : ${winner[0]} with ${higest_votes} votes`);
+        else console.log("\nThe election is tied");
+    }
 
 }
 
@@ -182,6 +207,7 @@ blockchain.add_vote("VOTER101", "Alice");
 blockchain.add_vote("VOTER102", "Bob")
 blockchain.add_vote("VOTER103", "Charlie")
 blockchain.add_vote("VOTER104", "Bob")
-blockchain.add_vote("VOTER105", "Bob")
+blockchain.add_vote("VOTER105", "Charlie")
 
+blockchain.declare_winner()
 //console.log(JSON.stringify(blockchain.blockchain, null, 4))
