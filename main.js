@@ -80,11 +80,11 @@ class Blockchain {
         }
 
         for ( let i = 1; i < this.blockchain.length; i++) {
-            currentBlock = this.blockchain[i];
-            previousBlock = this.blockchain[i-1];
+            const currentBlock = this.blockchain[i];
+            const previousBlock = this.blockchain[i-1];
 
             // Checking if block's hash is correct [This also ensures block data is not changed]
-            if (currentBlock.hash !== currentBlock.mine()) return false;
+            if (currentBlock.hash !== currentBlock.calcHash()) return false;
 
             // Previous Hash matches with hash of previous block
             if (currentBlock.prevHash !== previousBlock.hash) return false;
@@ -97,6 +97,8 @@ class Blockchain {
         for (const voter in vote) {
             if(vote[voter] >= 2) return false;
         }
+
+        return true;
     }
 
 
@@ -124,7 +126,11 @@ class Blockchain {
 const blockchain = new Blockchain;
 
 blockchain.add_vote("VOTER101", "Alice");
-blockchain.add_vote("VOTER_102", "Bob");
-
 blockchain.add_vote("VOTER102", "Bob")
-console.log(JSON.stringify(blockchain.blockchain, null, 4))
+blockchain.add_vote("VOTER103", "Charlie")
+blockchain.add_vote("VOTER104", "Bob")
+blockchain.add_vote("VOTER105", "Bob")
+
+blockchain.count_votes()
+
+//console.log(JSON.stringify(blockchain.blockchain, null, 4))
