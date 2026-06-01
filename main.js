@@ -20,10 +20,11 @@ class Block {
 
     // Proof of Time
     mine() {
+        const difficulty = 3
         const result = 0
         while(!result) {
             result = 1;
-            for ( let i = 0; i < 4; i++) {
+            for ( let i = 0; i < difficulty; i++) {
                 if (this.hash[i] !== '0') {
                     result = 0;
                     this.nonce++;
@@ -97,4 +98,26 @@ class Blockchain {
             if(vote[voter] >= 2) return false;
         }
     }
+
+
+    count_votes() {
+        if (!this.is_valid()) throw new Error("Error in voting system");
+
+        // Initializing Candidates list
+        const candi = {};
+        candidates.forEach(person => cand[person] = 0);
+
+        this.blockchain.forEach( vote => {
+            candi[vote.voteData.candidate]++;
+        })
+
+        for (const votes in candi) {
+            console.log(`${votes} : ${candi[votes]} votes\n`);
+        }
+
+        return candi
+    }
+
 }
+
+
