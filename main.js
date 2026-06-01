@@ -107,11 +107,11 @@ class Blockchain {
 
         // Initializing Candidates list
         const candi = {};
-        candidates.forEach(person => cand[person] = 0);
+        candidates.forEach(person => candi[person] = 0);
 
-        this.blockchain.forEach( vote => {
-            candi[vote.voteData.candidate]++;
-        })
+        for ( let i = 1; i < this.blockchain.length; i++ ) {
+            candi[this.blockchain[i].voteData.candidate]++;
+        }
 
         for (const votes in candi) {
             console.log(`${votes} : ${candi[votes]} votes\n`);
