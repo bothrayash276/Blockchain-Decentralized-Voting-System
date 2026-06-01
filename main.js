@@ -1,4 +1,5 @@
 const SHA256 = require('crypto-js/sha256')
+const fs = require('fs')
 
 // List of Voters and Candidates
 const registered_voters = ["VOTER101", "VOTER102", "VOTER103", "VOTER104", "VOTER105"]
@@ -197,6 +198,28 @@ class Blockchain {
         else console.log("\nThe election is tied");
     }
 
+
+    save_chain() {
+        // Converting it into JSON string
+        const jsonChain = JSON.stringify(this.blockchain);
+        // Saving file using fs module
+        fs.writeFileSync('data.json', jsonChain);
+
+        console.log("File Saved")
+    }
+
+    load_chain() {
+        // Checking if the file exist for loading the data
+        if ( !fs.existsSync('data.json') ) throw new Error("File does not exist");
+
+
+        const data = fs.readFileSync('data.json');
+        const jsonChain = JSON.parse(data);
+        this.blockchain = jsonChain
+
+        console.log("File Loaded")
+    }
+
 }
 
 
@@ -209,5 +232,7 @@ blockchain.add_vote("VOTER103", "Charlie")
 blockchain.add_vote("VOTER104", "Bob")
 blockchain.add_vote("VOTER105", "Charlie")
 
-blockchain.declare_winner()
+//blockchain.declare_winner()
+blockchain.load_chain()
+
 //console.log(JSON.stringify(blockchain.blockchain, null, 4))
