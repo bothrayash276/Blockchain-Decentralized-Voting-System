@@ -52,8 +52,8 @@ class Blockchain {
         const voter = registered_voters.filter(vID => vID === voter_id);
         const candi = candidates.filter(c => c === candidate);
 
-        if (!voter) throw new Error("Voter is not registered in the voting list");
-        if (!candi) throw new Error("Candidate is not present in the candidate list");
+        if (!voter[0]) throw new Error("Voter is not registered in the voting list");
+        if (!candi[0]) throw new Error("Candidate is not present in the candidate list");
 
         for ( let i = 1; i < this.blockchain.length; i++) {
             if (this.blockchain[i].voteData.voter_id === voter_id) throw new Error(`${voter_id} has already cast the vote`);
