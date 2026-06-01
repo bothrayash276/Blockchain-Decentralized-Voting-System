@@ -68,4 +68,33 @@ class Blockchain {
 
         this.blockchain.push(block);
     }
+
+
+    is_valid() {
+
+        // Initialized voters list
+        let vote = {};
+        for ( let i = 0; i < registered_voters.length; i++ ) {
+            vote[registered_voters[i]] = 0;
+        }
+
+        for ( let i = 1; i < this.blockchain.length; i++) {
+            currentBlock = this.blockchain[i];
+            previousBlock = this.blockchain[i-1];
+
+            // Checking if block's hash is correct [This also ensures block data is not changed]
+            if (currentBlock.hash !== currentBlock.mine()) return false;
+
+            // Previous Hash matches with hash of previous block
+            if (currentBlock.prevHash !== previousBlock.hash) return false;
+
+            // Incrementing Number of votes
+            vote[currentBlock.voteData.voter_id]++;
+        }
+
+        // Checking number of votes is less have 2
+        for (const voter in vote) {
+            if(vote[voter] >= 2) return false;
+        }
+    }
 }
