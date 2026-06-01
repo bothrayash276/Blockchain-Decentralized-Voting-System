@@ -10,7 +10,7 @@ class Block {
         this.voteData = voteData;
         this.prevHash = prevHash
         this.nonce = 0
-        this.hash = this.calcHash()
+        this.hash = 0
     }
 
     // Hash Constructor
@@ -21,14 +21,15 @@ class Block {
     // Proof of Time
     mine() {
         const difficulty = 3
-        const result = 0
+        let result = 0
         while(!result) {
             result = 1;
             for ( let i = 0; i < difficulty; i++) {
                 if (this.hash[i] !== '0') {
                     result = 0;
                     this.nonce++;
-                    this.hash = this.calcHash();
+                    this.hash = this.calcHash()
+                    
                     break;
                 }
             }
@@ -65,8 +66,7 @@ class Blockchain {
 
         const prevBlock = this.blockchain[this.blockchain.length -1];
         const block = new Block(prevBlock.index + 1, Date.now(), voteDate, prevBlock.hash);
-        block.hash = block.mine();
-
+        block.mine();
         this.blockchain.push(block);
     }
 
@@ -121,3 +121,10 @@ class Blockchain {
 }
 
 
+const blockchain = new Blockchain;
+
+blockchain.add_vote("VOTER101", "Alice");
+blockchain.add_vote("VOTER_102", "Bob");
+
+blockchain.add_vote("VOTER102", "Bob")
+console.log(JSON.stringify(blockchain.blockchain, null, 4))
