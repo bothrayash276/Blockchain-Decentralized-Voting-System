@@ -7,6 +7,8 @@ const rl = readline.createInterface({
     output : process.stdout
 })
 
+const ask = q => new Promise(resolve => rl.question(q, resolve))
+
 // List of Voters and Candidates
 const registered_voters = ["VOTER101", "VOTER102", "VOTER103", "VOTER104", "VOTER105"]
 const candidates = ["Alice", "Bob", "Charlie"]
@@ -25,7 +27,7 @@ class Block {
 
     // Hash Constructor
     calcHash() {
-        return SHA256(this.index + this.timestamps + JSON.stringify(this.voteData) + this.prevHash + this.nonce).toString()
+        return SHA256(this.index + this.timestamp + JSON.stringify(this.voteData) + this.prevHash + this.nonce).toString()
     }
 
     // Proof of Time
@@ -140,14 +142,15 @@ class Blockchain {
 
             // Checking if block's hash is correct [This also ensures block data is not changed otherwise its hash will not match]
             if (currentBlock.hash !== currentBlock.calcHash()) return false;
-
+          
+            
             // Previous Hash matches with hash of previous block
             if (currentBlock.prevHash !== previousBlock.hash) return false;
-
+            
             // Incrementing Number of votes
             vote[currentBlock.voteData.voter_id]++;
         }
-
+        
         // Checking number of votes is less have 2
         for (const voter in vote) {
             if(vote[voter] >= 2) return false;
@@ -220,11 +223,128 @@ class Blockchain {
 
         const data = fs.readFileSync('data.json');
         const jsonChain = JSON.parse(data);
-        this.blockchain = jsonChain
+        
+        this.blockchain = jsonChain.map(b => {
+            const block = new Block(b.index, b.timestamp, b.voteData, b.prevHash);
+            block.nonce = b.nonce;
+            block.hash = b.hash;
+            return block
+        })
 
     }
 
 }
 
+// CLI Commands
+
+
 const BC = new Blockchain;
-BC.load_chain()
+
+const showMenu = () => {
+    console.log("\nWELCOME TO VOTING PORTAL")
+    console.log("1. Register Vote")
+    console.log("2. View Blockchain")
+    console.log("3. Count Votes")
+    console.log("4. Check Chain Validity")
+    console.log("5. Declare Winner")
+    console.log("6. Exit")
+}
+
+const registerVote = async () => {
+
+    const voter_id = (await ask("\nEnter Voter ID: "))
+
+    console.log("\nChoose a Candidate")
+    candidates.forEach((c, i) => console.log(`${i + 1}. ${c}`))
+
+    const candidate = (await ask("Enter Candidate Name: "))
+
+    try {
+        BC.add_vote(voter_id, candidate)
+        console.log(`${voter_id} has successfully voted for ${candidate}`)
+    } catch (e) {
+        console.log(`Error: ${e.message}`)
+    }
+}
+
+const viewBlockchain = () => {
+    console.log(`\nDisplaying Blockchain`)
+    for (const block of BC.blockchain) {
+
+        if (block.index === 0) continue
+
+        console.log(`\n\nBlock : ${block.index}`)
+        console.log(`\t timestamp : ${block.timestamp}`)
+        console.log(`\t Nonce : ${block.nonce}`)
+        console.log(`\t Prev Hash : ${String(block.prevHash)}`)
+        console.log(`\t Hash : ${block.hash}`)
+        console.log(`\tVoter : ${block.voteData.voter_id}`)
+        console.log(`\tCandidate : ${block.voteData.candidate}`)  
+    }
+}
+
+const countVotes = () => {
+    console.log("Vote Count")
+    try {
+        BC.count_votes()
+    } catch (e) {
+        console.log(`Error: ${e.message}`)
+    }
+}
+
+const checkValidity = () => {
+    console.log("\nChain Validity")
+    const valid = BC.is_valid()
+    if (valid) console.log("Blockchain is Valid");
+    else console.log("Blockchain is invalid");
+}
+
+const declareWinner = () => {
+    try {
+        BC.declare_winner()
+    } catch (e) {
+        console.log(`Error: ${e.message}`)
+    }
+}
+
+
+
+// CLI UI
+
+const CLI = async () => {
+    while (true) {
+        showMenu()
+        const choice = (await ask("\nChoose an option : "))
+
+        switch (Number(choice)) {
+            case 1: 
+                await registerVote(); 
+                break;
+
+            case 2: 
+                viewBlockchain();
+                break;
+
+            case 3: 
+                countVotes();
+                break;
+
+            case 4: 
+                checkValidity();
+                break;
+            case 5: 
+                declareWinner();
+                break;
+            case 6:
+                console.log("\nGoodbye!\n")
+                return
+            default:
+                console.log("\nInvalid option. Please try again")
+        }
+    }
+}
+
+CLI()
+
+
+
